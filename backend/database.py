@@ -2,8 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "postgresql://speedybosh:speedybosh@localhost/speedybosh"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:@localhost:3306/speedybosh"
 
+# Use the provided DATABASE_URL (MySQL via pymysql)
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

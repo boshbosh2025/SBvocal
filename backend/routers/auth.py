@@ -6,6 +6,7 @@ from schemas.user import UserCreate
 
 router = APIRouter()
 
+# Dépendance pour obtenir une session DB
 def get_db():
     db = SessionLocal()
     try:

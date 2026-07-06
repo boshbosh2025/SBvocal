@@ -1,9 +1,8 @@
 import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from database import Base
-import models.user  # pour que Alembic détecte la table
-target_metadata = Base.metadata
+import backend.models.user  # pour que Alembic détecte la table
 
 from logging.config import fileConfig
 
