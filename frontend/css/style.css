@@ -1,0 +1,159 @@
+@import url("variables.css");
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-main);
+  background: #eef1f3;
+  color: var(--text-primary);
+}
+
+/* ── HEADER ── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--header-bg);
+  height: 96px;
+  padding: 0 24px;
+  border-top: 3px solid var(--amber);
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-logo {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--purple-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: var(--white);
+}
+.brand-text h1 { font-size: 18px; font-weight: 700; color: var(--white); }
+.brand-text p { font-size: 11px; color: var(--white); opacity: .9; }
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+.search-box {
+  display: flex; align-items: center; gap: 6px;
+}
+.search-box input {
+  width: 300px; height: 32px; border-radius: 16px; border: none;
+  padding: 0 14px; font-size: 12px; outline: none;
+}
+.icon-btn {
+  width: 32px; height: 32px; border: none; border-radius: 8px;
+  background: var(--blue-acc); color: var(--white); cursor: pointer;
+}
+.signin-pill {
+  background: var(--purple-mid); color: var(--white); border: none;
+  border-radius: 14px; height: 28px; padding: 0 14px; font-size: 12px; cursor: pointer;
+}
+.avatar-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--purple-mid); border: 2px solid var(--white);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--white); font-weight: 700; cursor: pointer;
+}
+
+/* ── VOICE VISUALIZER ── */
+.visualizer { text-align: center; padding: 20px 0 8px; }
+.pulse-ring {
+  width: 110px; height: 110px; margin: 0 auto; position: relative;
+}
+.pulse-ring .ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 1.5px solid var(--purple-hi);
+}
+.pulse-ring .ring:nth-child(2) { inset: 12px; border-color: var(--blue-acc); }
+.pulse-ring .ring:nth-child(3) { inset: 24px; border-color: var(--purple-lo); }
+.pulse-ring .mic { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+.pulse-ring.active .ring { animation: pulse 1.4s ease-out infinite; }
+.pulse-ring.active .ring:nth-child(2) { animation-delay: .3s; }
+.pulse-ring.active .ring:nth-child(3) { animation-delay: .6s; }
+@keyframes pulse {
+  0%   { transform: scale(.6); opacity: 1; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+.status-lbl { font-size: 12px; color: var(--purple-mid); margin-top: 6px; }
+
+.wave-bar { display: flex; gap: 3px; justify-content: center; align-items: flex-end; height: 18px; margin-top: 10px; }
+.wave-bar span { width: 6px; height: 6px; background: var(--purple-mid); border-radius: 1px; }
+.wave-bar.active span { animation: wave 1s ease-in-out infinite; }
+.wave-bar span:nth-child(odd) { animation-delay: .15s; }
+@keyframes wave { 0%,100% { height: 4px; } 50% { height: 18px; } }
+
+/* ── LAYOUT ── */
+.layout { display: flex; align-items: flex-start; }
+
+.sidebar {
+  background: var(--sidebar-bg);
+  width: 160px; margin: 20px 0 20px 16px;
+  border-radius: 8px; padding: 12px;
+  display: flex; flex-direction: column; min-height: 500px;
+}
+.sidebar h3 { color: var(--text-primary); font-size: 12px; margin-bottom: 8px; }
+.sidebar button {
+  background: var(--white); color: #060606; border: none;
+  height: 36px; border-radius: 8px; font-size: 12px; margin-bottom: 6px; cursor: pointer;
+  text-align: left; padding: 0 12px;
+}
+.sidebar button:hover { background: #65E0F0; }
+.sidebar .settings-btn { margin-top: auto; }
+
+.main-col { flex: 1; padding: 20px 16px; min-width: 0; }
+
+.card {
+  background: var(--white); border: 1px solid var(--bg-panel-light, #dfe6e8);
+  border-radius: var(--radius-lg); margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.card-title { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 10px 14px 2px; }
+.guide-text { font-size: 13px; font-weight: 700; padding: 0 14px 12px; }
+
+/* ── FORM ── */
+.form-row { display: flex; align-items: center; gap: 8px; padding: 6px 14px; }
+.form-row label { width: 70px; font-size: 12px; color: #060606; }
+.form-row input {
+  flex: 1; height: 34px; border: 1px solid #d7dee0; border-radius: 8px;
+  padding: 0 10px; font-size: 13px; outline: none;
+}
+.form-row input:focus { border-color: var(--purple-hi); }
+.mic-btn, .rewrite-btn, .send-btn {
+  border: none; border-radius: 8px; cursor: pointer; color: var(--white);
+  height: 34px; width: 40px; font-size: 14px;
+}
+.mic-btn { background: var(--purple-hi); }
+.mic-btn.recording { background: var(--red-err); }
+.rewrite-btn { background: var(--blue-acc); }
+.send-btn { background: var(--teal-ok); width: auto; padding: 0 18px; font-weight: 600; }
+
+.body-textarea {
+  width: calc(100% - 28px); margin: 6px 14px; height: 110px;
+  border: 1px solid #d7dee0; border-radius: 10px; padding: 10px; font-size: 12px; resize: vertical;
+}
+.body-actions { display: flex; gap: 8px; padding: 0 14px 14px; }
+
+/* ── LOG ── */
+.log-card { padding: 10px 14px 14px; }
+.log-header { font-size: 12px; margin-bottom: 6px; }
+.log-search-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.log-search-row input {
+  flex: 1; height: 32px; border: 1px solid #d7dee0; border-radius: 8px; padding: 0 10px; font-size: 12px;
+}
+.log-search-row select {
+  height: 32px; border-radius: 8px; border: 1px solid #d7dee0; background: var(--blue-acc);
+  color: var(--white); font-size: 12px; padding: 0 8px;
+}
+.console {
+  background: var(--white); color: var(--teal-lt); font-family: "Courier New", monospace;
+  font-size: 11px; height: 200px; overflow-y: auto; border-radius: 10px; padding: 10px;
+  border: 1px solid #eee;
+}
+.console .line { white-space: pre-wrap; margin-bottom: 2px; }
+
+.quit-btn {
+  display: block; width: calc(100% - 32px); margin: 0 16px 16px;
+  background: #2e0d0d; color: var(--red-err); border: 1px solid var(--red-err);
+  height: 38px; border-radius: 10px; cursor: pointer; font-size: 13px;
+}
+.quit-btn:hover { background: #4a1515; }
+
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .search-box input { width: 160px; }
+}

@@ -1,11 +1,13 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:@localhost:3306/speedybosh"
+DATABASE_URL = "mysql+pymysql://root:@localhost/speedybosh"
 
-# Use the provided DATABASE_URL (MySQL via pymysql)
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,       # vérifie la connexion avant chaque requête
+    pool_recycle=3600         # recycle la connexion toutes les heures
+)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()   # indispensable pour Alembic
+Base = declarative_base()

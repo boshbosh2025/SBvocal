@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpeedyBosh — Connexion</title>
+<link rel="stylesheet" href="css/variables.css">
+<style>
+  body {
+    font-family: var(--font-main);
+    background: linear-gradient(160deg, var(--header-bg), #4fc2cf);
+    height: 100vh; display: flex; align-items: center; justify-content: center;
+  }
+  .login-card {
+    background: var(--white); width: 360px; border-radius: 16px;
+    padding: 32px 28px; box-shadow: 0 12px 40px rgba(0,0,0,.2);
+  }
+  .login-card h1 { font-size: 20px; color: var(--text-primary); margin-bottom: 2px; }
+  .login-card p.tagline { font-size: 12px; color: var(--gray-txt); margin-bottom: 20px; }
+  .tabs { display: flex; margin-bottom: 18px; border-radius: 10px; overflow: hidden; border: 1px solid #e0e6e8; }
+  .tabs button {
+    flex: 1; height: 36px; border: none; background: var(--white); cursor: pointer; font-size: 13px; color: var(--gray-txt);
+  }
+  .tabs button.active { background: var(--purple-hi); color: var(--white); font-weight: 600; }
+  form { display: none; flex-direction: column; gap: 10px; }
+  form.active { display: flex; }
+  input {
+    height: 38px; border: 1px solid #d7dee0; border-radius: 8px; padding: 0 12px; font-size: 13px; outline: none;
+  }
+  input:focus { border-color: var(--purple-hi); }
+  button.submit {
+    height: 40px; border: none; border-radius: 10px; background: var(--teal-ok);
+    color: var(--white); font-weight: 600; cursor: pointer; margin-top: 6px;
+  }
+  button.submit:hover { background: var(--purple-hi); }
+  .error { color: #b23b3b; font-size: 12px; min-height: 16px; }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .logo-row .dot { width: 40px; height: 40px; border-radius: 50%; background: var(--purple-mid); display: flex; align-items: center; justify-content: center; color: var(--white); }
+</style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="logo-row">
+      <div class="dot">✉</div>
+      <div>
+        <h1>SpeedyBosh</h1>
+        <p class="tagline" style="margin:0;">Writing emails by voice</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button id="tab-login" class="active">Se connecter</button>
+      <button id="tab-register">Créer un compte</button>
+    </div>
+
+    <form id="form-login" class="active">
+      <input type="email" id="login-email" placeholder="Email" required>
+      <input type="password" id="login-password" placeholder="Mot de passe" required>
+      <div class="error" id="login-error"></div>
+      <button type="submit" class="submit">Se connecter</button>
+    </form>
+
+    <form id="form-register">
+      <input type="text" id="reg-username" placeholder="Nom d'utilisateur" required>
+      <input type="email" id="reg-email" placeholder="Email" required>
+      <input type="password" id="reg-password" placeholder="Mot de passe" required>
+      <div class="error" id="register-error"></div>
+      <button type="submit" class="submit">Créer mon compte</button>
+    </form>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    const tabLogin = document.getElementById("tab-login");
+    const tabRegister = document.getElementById("tab-register");
+    const formLogin = document.getElementById("form-login");
+    const formRegister = document.getElementById("form-register");
+
+    tabLogin.onclick = () => {
+      tabLogin.classList.add("active"); tabRegister.classList.remove("active");
+      formLogin.classList.add("active"); formRegister.classList.remove("active");
+    };
+    tabRegister.onclick = () => {
+      tabRegister.classList.add("active"); tabLogin.classList.remove("active");
+      formRegister.classList.add("active"); formLogin.classList.remove("active");
+    };
+
+    // Redirige directement vers le dashboard si déjà connecté
+    if (Api.getToken()) {
+      Api.me().then(() => window.location.href = "dashboard.html").catch(() => Api.clearToken());
+    }
+
+    formLogin.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      const errEl = document.getElementById("login-error");
+      errEl.textContent = "";
+      try {
+        await Api.login(email, password);
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        errEl.textContent = err.message;
+      }
+    });
+
+    formRegister.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("reg-username").value;
+      const email = document.getElementById("reg-email").value;
+      const password = document.getElementById("reg-password").value;
+      const errEl = document.getElementById("register-error");
+      errEl.textContent = "";
+      try {
+        await Api.register(username, email, password);
+        await Api.login(email, password);
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        errEl.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

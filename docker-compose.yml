@@ -1,13 +1,11 @@
+version: "3.9"
+
 services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: speedybosh
-      POSTGRES_PASSWORD: speedybosh
-      POSTGRES_DB: speedybosh
+  backend:
+    build: .
+    container_name: fastapi-backend
     ports:
-      - "5432:5432"
+      - "8000:8000"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-volumes:
-  pgdata:
+      - .:/app
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
