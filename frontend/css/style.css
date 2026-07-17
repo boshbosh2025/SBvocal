@@ -13,20 +13,40 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--header-bg);
-  height: 96px;
-  padding: 0 24px;
-  border-top: 3px solid var(--amber);
+  background-color: #008b8b;
+  padding: 10px 20px;
 }
-.brand { display: flex; align-items: center; gap: 12px; }
-.brand-logo {
-  width: 56px; height: 56px; border-radius: 50%;
-  background: var(--purple-mid);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; color: var(--white);
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.brand-text h1 { font-size: 18px; font-weight: 700; color: var(--white); }
-.brand-text p { font-size: 11px; color: var(--white); opacity: .9; }
+
+.brand-logo img {
+  width: 60px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.logo {
+  width: 60px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.brand-text h1 {
+  font-size: 20px;
+  color: #fff;
+  margin: 0;
+}
+
+.brand-text p {
+  font-size: 12px;
+  color: #e0e0e0;
+  margin: 0;
+}
 
 .header-right { display: flex; align-items: center; gap: 10px; }
 .search-box {
