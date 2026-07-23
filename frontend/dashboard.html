@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpeedyBosh</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo"><img src="img/speedybosh_logo2.png" alt="" class="logo"></div>
+      <div class="brand-text">
+        <h1>SpeedyBosh</h1>
+        <p>Writing emails by voice</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="search-box">
+        <input id="search-input" type="text" placeholder="Rechercher (noms, dates, mails, messages)">
+        <button class="icon-btn" id="search-btn">🔍</button>
+        <button class="icon-btn" id="sort-toggle-btn">⇅</button>
+      </div>
+      <button class="signin-pill" id="signin-pill">Sign in</button>
+      <div class="avatar-circle" id="avatar-circle">?</div>
+    </div>
+  </header>
+
+  <!-- ── VISUALIZER ── -->
+  <section class="visualizer">
+    <div class="pulse-ring" id="pulse-ring">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="mic">🎤</div>
+    </div>
+    <div class="status-lbl" id="status-lbl">SpeedyBosh</div>
+    <div class="wave-bar" id="wave-bar">
+      <!-- 20 barres générées en JS -->
+    </div>
+  </section>
+
+  <!-- ── LAYOUT ── -->
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h3>InBox</h3>
+      <button id="btn-new-mail">📨  New email</button>
+      <button id="btn-sent">📤  Sent</button>
+      <button id="btn-all-mail">📥  All Mail</button>
+      <button id="btn-trash">🗑  Trash</button>
+      <button id="btn-starred">⭐  Starred</button>
+      <button id="btn-history">🕘  Historical</button>
+      <button class="settings-btn" id="btn-settings">⚙️  Settings</button>
+    </aside>
+
+    <!-- MAIN COLUMN -->
+    <main class="main-col">
+
+      <!-- VOICE GUIDE -->
+      <div class="card">
+        <div class="card-title">VOICE GUIDE</div>
+        <div class="guide-text" id="guide-text">Say "Hello" to start</div>
+      </div>
+
+      <!-- FORM -->
+      <div class="card">
+        <div class="card-title" style="padding-top:10px;">Send an email</div>
+
+        <div class="form-row">
+          <label>To :</label>
+          <input type="text" id="dest-input" placeholder="destinataire@exemple.com">
+          <button class="mic-btn" data-field="destinataire">🎤</button>
+          <button class="rewrite-btn" data-field="destinataire">✍️</button>
+        </div>
+
+        <div class="form-row">
+          <label>Subject :</label>
+          <input type="text" id="obj-input">
+          <button class="mic-btn" data-field="objet">🎤</button>
+          <button class="rewrite-btn" data-field="objet">✍️</button>
+        </div>
+
+        <div class="card-title" style="padding-top:10px;">New Message :</div>
+        <textarea class="body-textarea" id="corps-input"></textarea>
+        <div class="body-actions">
+          <button class="mic-btn" data-field="corps">🎤</button>
+          <button class="send-btn" id="send-btn">Send</button>
+          <button class="rewrite-btn" data-field="corps">✍️</button>
+        </div>
+      </div>
+
+      <!-- LOG -->
+      <div class="card log-card">
+        <div class="log-header">LOG</div>
+        <div class="log-search-row">
+          <input type="text" id="log-search" placeholder="Rechercher dans les messages">
+          <select id="log-sort">
+            <option value="date_desc">Date ↓</option>
+            <option value="date_asc">Date ↑</option>
+            <option value="alpha_asc">Alpha A→Z</option>
+            <option value="alpha_desc">Alpha Z→A</option>
+          </select>
+        </div>
+        <div class="console" id="console"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <button class="quit-btn" id="btn-logout">✕  Se déconnecter</button>
+
+  <script src="js/api.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
