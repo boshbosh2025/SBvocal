@@ -5,7 +5,7 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 
 from backend.database import SQLALCHEMY_DATABASE_URL, Base
-from backend.models import user
+from backend.models import user, mail
 
 config = context.config
 config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)

@@ -1,8 +1,9 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from backend.database import Base
-import backend.models.user  # pour que Alembic détecte la table
+from backend.database import SQLALCHEMY_DATABASE_URL, Base
+import backend.models.user
+import backend.models.mail
 
 from logging.config import fileConfig
 
@@ -14,6 +15,7 @@ from alembic import context
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -30,8 +32,6 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:@localhost:3306/speedybosh"
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

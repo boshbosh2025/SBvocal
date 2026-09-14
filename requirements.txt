@@ -6,3 +6,6 @@ python-jose
 fastapi
 uvicorn
 pydantic[email]
+openai
+pyspellchecker
+python-dotenv

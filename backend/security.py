@@ -12,6 +12,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 # Configuration SMTP (à modifier avec vos vraies identifiants Gmail)
 SMTP_EMAIL = "mohamedbacharmhamed@gmail.com"
 SMTP_PASSWORD = "eqxwfdxycqwonauv"
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
 
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()

@@ -1,0 +1,31 @@
+Bonjour à tous, je suis ravi de vous présenter aujourd’hui notre projet FlehaSmart .
+
+FlehaSmart est bien plus qu’une application.C’est une plateforme collaborative conçue pour faire émerger et valoriser les solutions locales.
+C’est une vision portée par notre groupe EcoInnovators, une équipe passionnée par l’innovation durable et les solutions territoriales.
+
+
+ Pour vous présenter FlehaSmart de manière complète et structurée, nous allons suivre ensemble un parcours en huit étapes clés.
+
+Introduction & Problématique
+Nous commencerons par poser le contexte et identifier les défis concrets auxquels nous répondons.
+
+Étude de l’existant & Critique générale
+Nous analyserons ce qui se fait déjà sur le marché, et quelles sont les limites que nous voulons dépasser.
+
+Notre solution & son alignement avec les ODD
+C’est là que nous dévoilerons FlehaSmart en détail, et comment il s’inscrit dans les Objectifs de Développement Durable.
+
+Identification des acteurs
+Nous verrons qui sont les parties prenantes : utilisateurs, partenaires, bénéficiaires.
+
+Spécifications fonctionnelles
+Nous entrerons dans le concret : comment fonctionne l’application, quelles sont ses principales fonctionnalités.
+
+Maquettes des interfaces
+Nous vous donnerons un aperçu visuel de l’expérience utilisateur à travers nos maquettes.
+
+Stratégie Marketing
+Nous expliquerons comment nous comptons faire connaître FlehaSmart et toucher notre public.
+
+Enfin, la Conclusion
+Nous synthétiserons l’essentiel et partagerons notre vision pour l’avenir.
