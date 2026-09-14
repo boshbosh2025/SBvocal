@@ -1,0 +1,28 @@
+/* ─────────────────────────────────────────────────────────────
+   SpeedyBosh — palette recalculée depuis main.py (_shade(BASE_RGB, f))
+   BASE_RGBA = (0, 151, 172, 100)
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --bg-deep:      #FFFFFF;
+  --bg-panel:     #001e22;
+  --bg-card:      #00272c;
+  --purple-hi:    #0097ac;   /* couleur de base */
+  --purple-mid:   #008092;
+  --purple-lo:    #00bcd7;
+  --blue-acc:     #00adc5;
+  --teal-ok:      #0097ac;
+  --teal-lt:      #00daf9;
+  --red-err:      #005a67;   /* nom hérité du code source, reste dans les teals */
+  --amber:        #00f1ff;   /* idem : pas un vrai orange dans le code d'origine */
+  --gray-txt:     #004852;
+  --white:        #FFFFFF;
+  --text-primary: #0f1724;
+
+  --header-bg:    #097D8D;   /* couleur explicite utilisée dans le header/sidebar */
+  --sidebar-bg:   #097D8D;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font-main: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}

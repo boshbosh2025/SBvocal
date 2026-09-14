@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>SpeedyBosh — Voice Email Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="img/speedybosh_logo2.png" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #E8F8FA;
+            color: #1A1A2E;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #E8F8FA; }
+        ::-webkit-scrollbar-thumb { background: #00B4D8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0077B6; }
+
+        .topbar {
+            background: #FFFFFF;
+            padding: 12px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #90E0EF;
+            box-shadow: 0 2px 12px rgba(0, 180, 216, 0.08);
+            flex-shrink: 0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 14px; }
+        .logo-icon {
+            width: 42px; height: 42px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .logo-icon .logo { height: 40px; width: auto; object-fit: contain; }
+        .logo-text {
+            font-size: 22px; font-weight: 800;
+            background: linear-gradient(135deg, #0077B6, #00D4FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        .logo-text span {
+            font-weight: 400; color: #6B7280; font-size: 13px;
+            -webkit-text-fill-color: #6B7280; margin-left: 6px;
+        }
+        .search-bar {
+            display: flex; align-items: center; background: #F0FAFC;
+            border-radius: 12px; padding: 6px 18px; width: 340px;
+            transition: all 0.25s; border: 2px solid transparent;
+        }
+        .search-bar:focus-within {
+            background: #FFFFFF; border-color: #00B4D8;
+            box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.12);
+        }
+        .search-bar input {
+            border: none; background: transparent; padding: 9px 0;
+            font-size: 14px; width: 100%; outline: none;
+            color: #1A1A2E; font-family: 'Inter', sans-serif;
+        }
+        .search-bar input::placeholder { color: #9CA3AF; }
+        .search-icon { color: #00B4D8; font-size: 18px; margin-right: 12px; }
+        .topbar-right { display: flex; align-items: center; gap: 18px; }
+        .wake-btn {
+            background: #F0FAFC; border: 1px solid #90E0EF;
+            padding: 5px 14px; border-radius: 100px; font-size: 12px;
+            font-weight: 500; color: #0077B6; cursor: pointer;
+            transition: all 0.2s; font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+        .wake-btn:hover { background: #E8F8FA; border-color: #00B4D8; }
+        .wake-btn.active { background: #DCFCE7; border-color: #22C55E; color: #16A34A; }
+        .status-badge {
+            background: #E8F8FA; padding: 5px 16px; border-radius: 100px;
+            font-size: 12px; font-weight: 500; color: #0077B6;
+            display: flex; align-items: center; gap: 8px;
+            border: 1px solid #90E0EF;
+        }
+        .status-badge .dot {
+            width: 8px; height: 8px; background: #22C55E;
+            border-radius: 50%; display: inline-block;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+        .avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: linear-gradient(135deg, #0077B6, #00D4FF);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 16px;
+            cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 2px 8px rgba(0, 180, 216, 0.25);
+        }
+        .avatar:hover {
+            transform: scale(1.06);
+            box-shadow: 0 4px 20px rgba(0, 180, 216, 0.4);
+        }
+        .topbar-right .logout-link {
+            font-size: 13px; color: #EF4444; cursor: pointer;
+            font-weight: 500; transition: color 0.2s; text-decoration: none;
+        }
+        .topbar-right .logout-link:hover { color: #DC2626; }
+
+        .main-container {
+            display: flex; flex: 1; overflow: hidden;
+            padding: 20px 28px; gap: 24px;
+        }
+
+        .sidebar {
+            width: 230px; background: #FFFFFF; border-radius: 18px;
+            padding: 18px 12px;
+            box-shadow: 0 4px 24px rgba(0, 180, 216, 0.06);
+            flex-shrink: 0; display: flex; flex-direction: column;
+            border: 1px solid #E8F8FA; height: 100%; overflow-y: auto;
+        }
+        .sidebar .nav-section { margin-bottom: 20px; }
+        .sidebar .nav-section .label {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.8px; color: #90E0EF;
+            padding: 0 14px; margin-bottom: 8px;
+        }
+        .sidebar .nav-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 10px 16px; border-radius: 12px; cursor: pointer;
+            transition: all 0.15s; color: #6B7280;
+            font-weight: 500; font-size: 14px;
+            text-decoration: none; margin-bottom: 2px;
+            border: none; background: none; width: 100%; text-align: left;
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar .nav-item:hover { background: #F0FAFC; color: #0077B6; }
+        .sidebar .nav-item.active { background: linear-gradient(135deg, #F0FAFC, #E8F8FA); color: #0077B6; font-weight: 600; border-right: 3px solid #00B4D8; }
+        .sidebar .nav-item .icon { font-size: 18px; width: 26px; text-align: center; }
+        .sidebar .nav-item .badge {
+            margin-left: auto; background: #E8F8FA;
+            padding: 2px 12px; border-radius: 100px;
+            font-size: 11px; font-weight: 600; color: #0077B6;
+        }
+        .sidebar .nav-item.active .badge { background: #00B4D8; color: white; }
+        .sidebar-divider { border: none; border-top: 2px solid #F0FAFC; margin: 6px 12px 14px; }
+        .sidebar-footer {
+            margin-top: auto; padding: 14px 16px;
+            background: linear-gradient(135deg, #F0FAFC, #E8F8FA);
+            border-radius: 14px; border: 1px solid #90E0EF;
+        }
+        .sidebar-footer .version { font-size: 11px; color: #6B7280; font-weight: 500; }
+        .sidebar-footer .app-name { font-size: 14px; font-weight: 700; color: #0077B6; }
+        .sidebar-footer .company { font-size: 11px; color: #9CA3AF; }
+
+        .content {
+            flex: 1; display: flex; flex-direction: column;
+            gap: 18px; overflow-y: auto; padding-right: 4px;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .stat-card {
+            background: #FFFFFF; border-radius: 16px; padding: 20px 24px;
+            box-shadow: 0 2px 12px rgba(0, 180, 216, 0.06);
+            transition: all 0.25s; border: 1px solid #E8F8FA;
+            position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 4px; border-radius: 16px 16px 0 0;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(0, 180, 216, 0.12);
+            border-color: #90E0EF;
+        }
+        .stat-card .stat-icon { font-size: 24px; margin-bottom: 8px; }
+        .stat-card .stat-number { font-size: 30px; font-weight: 800; color: #1A1A2E; letter-spacing: -0.5px; }
+        .stat-card .stat-label { font-size: 14px; color: #6B7280; font-weight: 500; margin-top: 2px; }
+        .stat-card .stat-change {
+            font-size: 12px; font-weight: 600; margin-top: 6px;
+            display: inline-block; padding: 2px 12px; border-radius: 100px;
+        }
+        .stat-card .stat-change.up { background: #DCFCE7; color: #16A34A; }
+        .stat-card .stat-change.down { background: #FEE2E2; color: #DC2626; }
+        .stat-card.turquoise::before { background: linear-gradient(90deg, #0077B6, #00D4FF); }
+        .stat-card.turquoise .stat-number { color: #0077B6; }
+        .stat-card.green::before { background: #22C55E; }
+        .stat-card.green .stat-number { color: #22C55E; }
+        .stat-card.orange::before { background: #F59E0B; }
+        .stat-card.orange .stat-number { color: #F59E0B; }
+        .stat-card.pink::before { background: #EC4899; }
+        .stat-card.pink .stat-number { color: #EC4899; }
+
+        .compose-card {
+            background: #FFFFFF; border-radius: 16px; padding: 18px 24px;
+            box-shadow: 0 2px 12px rgba(0, 180, 216, 0.06);
+            border: 1px solid #E8F8FA;
+        }
+        .compose-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #0077B6; }
+        .guide-text { font-size: 14px; color: #6B7280; font-weight: 500; padding: 8px 0; }
+        .form-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .form-row label { font-size: 14px; font-weight: 500; color: #6B7280; min-width: 70px; flex-shrink: 0; }
+        .input-group {
+            display: flex; flex-grow: 1; align-items: center;
+        }
+        .input-group input {
+            flex: 1; padding: 8px 12px; border: 1px solid #E5E7EB;
+            border-radius: 8px 0 0 8px; font-size: 14px; outline: none;
+            font-family: 'Inter', sans-serif; transition: border-color 0.2s;
+        }
+        .input-group input:focus { border-color: #00B4D8; }
+        .input-group .mic-btn {
+            height: 38px; width: 38px; flex-shrink: 0;
+            background: #F0FAFC; color: #0077B6;
+            border: 1px solid #E5E7EB; border-left: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .input-group .mic-btn:hover { background: #E8F8FA; color: #00B4D8; }
+        .input-group .mic-btn.recording { background: #FEE2E2; border-color: #DC2626; color: #DC2626; animation: mic-pulse 0.8s ease-in-out infinite; }
+        @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3)} 50%{box-shadow:0 0 0 8px rgba(220,38,38,0)} }
+        .form-row.body-row { align-items: flex-start; }
+        .body-input-wrapper {
+            display: flex; flex-grow: 1; align-items: flex-start; gap: 8px;
+        }
+        .body-input-wrapper textarea {
+            flex: 1; padding: 8px 12px; border: 1px solid #E5E7EB;
+            border-radius: 8px; font-size: 14px; outline: none;
+            font-family: 'Inter', sans-serif; resize: vertical; min-height: 80px;
+            transition: border-color 0.2s;
+        }
+        .body-input-wrapper textarea:focus { border-color: #00B4D8; }
+        .body-actions {
+            display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
+        }
+        .icon-btn {
+            width: 34px; height: 34px; border-radius: 8px;
+            border: 1px solid #E5E7EB; background: #fff;
+            cursor: pointer; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: #F0FAFC; border-color: #90E0EF; }
+        .icon-btn.loading { opacity: 0.5; pointer-events: none; }
+        .icon-btn.recording { background: #FEE2E2; border-color: #DC2626; color: #DC2626; animation: mic-pulse 0.8s ease-in-out infinite; }
+        .file-preview {
+            margin-top: 8px; padding: 8px 12px; background: #F0FAFC;
+            border: 1px dashed #90E0EF; border-radius: 8px;
+            font-size: 13px; color: #0077B6; display: none;
+            font-family: 'Inter', sans-serif; line-height: 1.6;
+        }
+        .file-preview.show { display: block; }
+
+        .form-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+        .form-actions .send-btn {
+            height: 38px; padding: 0 24px; border-radius: 100px; border: none;
+            background: linear-gradient(135deg, #0077B6, #00D4FF); color: white;
+            font-weight: 600; font-size: 14px; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: all 0.2s;
+        }
+        .form-actions .send-btn:hover { background: linear-gradient(135deg, #005C8E, #0099CC); }
+
+        .pulse-ring { display: inline-flex; align-items: center; gap: 4px; }
+        .pulse-ring .ring { width: 8px; height: 8px; border-radius: 50%; background: #00B4D8; display: none; }
+        .pulse-ring.active .ring { display: inline-block; animation: ring-pulse 1s ease-in-out infinite; }
+        .pulse-ring.active .ring:nth-child(2) { animation-delay: 0.2s; }
+        .pulse-ring.active .ring:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes ring-pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+        .wave-bar { display: flex; align-items: flex-end; gap: 2px; height: 24px; }
+        .wave-bar span { width: 4px; background: #00B4D8; border-radius: 2px; height: 4px; display: none; }
+        .wave-bar.active span { display: block; animation: wave .6s ease-in-out infinite alternate; }
+        .wave-bar.active span:nth-child(1) { animation-delay: 0s; }
+        .wave-bar.active span:nth-child(2) { animation-delay: 0.05s; }
+        .wave-bar.active span:nth-child(3) { animation-delay: 0.1s; }
+        .wave-bar.active span:nth-child(4) { animation-delay: 0.15s; }
+        .wave-bar.active span:nth-child(5) { animation-delay: 0.2s; }
+        .wave-bar.active span:nth-child(6) { animation-delay: 0.25s; }
+        .wave-bar.active span:nth-child(7) { animation-delay: 0.3s; }
+        .wave-bar.active span:nth-child(8) { animation-delay: 0.35s; }
+        .wave-bar.active span:nth-child(9) { animation-delay: 0.4s; }
+        .wave-bar.active span:nth-child(10) { animation-delay: 0.45s; }
+        .wave-bar.active span:nth-child(11) { animation-delay: 0.5s; }
+        .wave-bar.active span:nth-child(12) { animation-delay: 0.55s; }
+        .wave-bar.active span:nth-child(13) { animation-delay: 0.6s; }
+        .wave-bar.active span:nth-child(14) { animation-delay: 0.65s; }
+        .wave-bar.active span:nth-child(15) { animation-delay: 0.7s; }
+        .wave-bar.active span:nth-child(16) { animation-delay: 0.75s; }
+        .wave-bar.active span:nth-child(17) { animation-delay: 0.8s; }
+        .wave-bar.active span:nth-child(18) { animation-delay: 0.85s; }
+        .wave-bar.active span:nth-child(19) { animation-delay: 0.9s; }
+        .wave-bar.active span:nth-child(20) { animation-delay: 0.95s; }
+        @keyframes wave { 0%{height:4px} 100%{height:20px} }
+        .status-lbl { font-size: 12px; color: #9CA3AF; }
+
+        .email-list {
+            background: #FFFFFF; border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 180, 216, 0.06);
+            border: 1px solid #E8F8FA; display: flex; flex-direction: column;
+        }
+        .email-list h2 {
+            font-size: 16px; font-weight: 700; padding: 16px 22px 0; color: #1A1A2E;
+        }
+
+        .mail-toolbar {
+            display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+            padding: 10px 22px; border-bottom: 2px solid #F0FAFC;
+        }
+        .mail-toolbar button {
+            background: transparent; border: 1px solid #E8F8FA;
+            padding: 4px 16px; border-radius: 100px; font-size: 12px;
+            font-weight: 500; color: #6B7280; cursor: pointer;
+            transition: all 0.15s; font-family: 'Inter', sans-serif;
+        }
+        .mail-toolbar button:hover { background: #F0FAFC; border-color: #90E0EF; color: #0077B6; }
+        .mail-toolbar #selected-count { margin-left: auto; font-size: 12px; color: #9CA3AF; }
+
+        .mail-item {
+            display: flex; align-items: center; padding: 12px 22px;
+            border-bottom: 1px solid #F9FAFB; gap: 14px;
+            transition: all 0.15s;
+        }
+        .mail-item:hover { background: #FAFDFE; }
+        .mail-item.fade-out { opacity: 0; transform: translateX(-20px); transition: all 0.4s; }
+        .mail-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .mail-actions input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        .mail-actions i { cursor: pointer; font-size: 16px; color: #9CA3AF; transition: color 0.15s; }
+        .mail-actions i:hover { color: #00B4D8; }
+        .mail-actions .mail-star.text-warning { color: #F59E0B; }
+        .mail-actions .mail-star.fa-solid.text-warning { color: #F59E0B; }
+        .mail-actions .mail-trash:hover { color: #DC2626; }
+        .mail-actions .mail-restore:hover { color: #22C55E; }
+        .mail-info { flex: 1; min-width: 0; }
+        .mail-info p { font-size: 13px; color: #6B7280; margin-bottom: 2px; }
+        .mail-info p strong { color: #1A1A2E; font-weight: 600; }
+
+        .voice-module {
+            background: #FFFFFF; border-radius: 16px; padding: 16px 24px;
+            box-shadow: 0 2px 12px rgba(0, 180, 216, 0.06);
+            border: 1px solid #E8F8FA;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0; gap: 16px; flex-wrap: wrap;
+        }
+        .voice-module .voice-left { display: flex; align-items: center; gap: 18px; }
+        .voice-module .voice-btn {
+            width: 52px; height: 52px; border-radius: 50%; border: none;
+            background: linear-gradient(135deg, #0077B6, #00D4FF);
+            color: white; font-size: 24px; cursor: pointer;
+            transition: all 0.25s; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; box-shadow: 0 4px 16px rgba(0, 180, 216, 0.3);
+        }
+        .voice-module .voice-btn:hover {
+            transform: scale(1.06);
+            box-shadow: 0 6px 28px rgba(0, 180, 216, 0.45);
+        }
+        .voice-module .voice-btn.listening {
+            background: linear-gradient(135deg, #DC2626, #EF4444);
+            animation: voice-pulse 1.2s ease-in-out infinite;
+            box-shadow: 0 4px 20px rgba(220, 38, 38, 0.35);
+        }
+        @keyframes voice-pulse {
+            0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.4)}
+            50%{box-shadow:0 0 0 16px rgba(220,38,38,0)}
+        }
+        .voice-module .voice-status { font-size: 14px; color: #6B7280; }
+        .voice-module .voice-status strong { color: #1A1A2E; font-weight: 600; }
+        .voice-module .voice-status .highlight { color: #0077B6; font-weight: 700; }
+        .voice-transcript {
+            background: linear-gradient(135deg, #F0FAFC, #E8F8FA);
+            padding: 8px 22px; border-radius: 100px;
+            font-size: 14px; color: #1A1A2E; font-weight: 500;
+            max-width: 380px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            border: 1px solid #90E0EF; min-height: 42px;
+            display: flex; align-items: center;
+        }
+        .voice-transcript .mic-icon { margin-right: 10px; color: #00B4D8; }
+
+        .log-module {
+            background: #FFFFFF; border-radius: 16px; padding: 14px 22px;
+            box-shadow: 0 2px 12px rgba(0, 180, 216, 0.06);
+            border: 1px solid #E8F8FA; flex-shrink: 0; max-height: 160px; overflow-y: auto;
+        }
+        .log-module .log-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+        }
+        .log-module .log-header h4 { font-size: 13px; font-weight: 700; color: #0077B6; text-transform: uppercase; letter-spacing: 0.5px; }
+        .log-module .log-header .log-count { font-size: 12px; color: #9CA3AF; font-weight: 500; }
+        .console { background: transparent; }
+        .console .line {
+            font-size: 13px; color: #6B7280; padding: 3px 0;
+            border-bottom: 1px solid #F9FAFB; font-family: 'Inter', monospace;
+        }
+
+        footer {
+            padding: 12px 36px; border-top: 2px solid #90E0EF;
+            background: #FFFFFF; font-size: 13px; color: #9CA3AF;
+            display: flex; justify-content: space-between; flex-shrink: 0;
+        }
+
+        .avatar-wrapper { position: relative; cursor: pointer; }
+        .avatar-wrapper .avatar { box-shadow: 0 4px 16px rgba(0,180,216,0.3); border: 3px solid #fff; position: relative; }
+        .avatar-wrapper .status-dot {
+            position: absolute; bottom: 2px; right: 2px; width: 14px; height: 14px;
+            background: #22C55E; border-radius: 50%; border: 3px solid #fff;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        .user-menu {
+            position: absolute; top: 100%; right: 0; margin-top: 12px;
+            background: #fff; border-radius: 18px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.04);
+            border: 1px solid #E8F8FA; width: 340px; padding: 12px 0;
+            opacity: 0; visibility: hidden;
+            transform: translateY(-8px) scale(0.96);
+            transition: all 0.25s cubic-bezier(0.2,0,0,1);
+            z-index: 1001; transform-origin: top right;
+        }
+        .user-menu.open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .user-menu .menu-header { padding: 4px 20px 12px; border-bottom: 1px solid #F1F3F5; }
+        .user-menu .menu-header .user-row { display: flex; align-items: center; gap: 14px; }
+        .user-menu .menu-header .user-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg,#0077B6,#00D4FF);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 18px; flex-shrink: 0;
+        }
+        .user-menu .menu-header .user-info { text-align: left; flex: 1; min-width: 0; }
+        .user-menu .menu-header .user-info .name { font-weight: 600; font-size: 15px; color: #1A1A2E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-menu .menu-header .user-info .email { font-size: 13px; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-menu .menu-header .user-info .badge { font-size: 11px; font-weight: 600; color: #0077B6; background: #E8F8FA; padding: 2px 12px; border-radius: 100px; display: inline-block; margin-top: 3px; }
+        .user-menu .menu-footer { padding: 8px 20px 4px; }
+        .user-menu .menu-footer .sign-out {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+            border-radius: 12px; cursor: pointer; transition: all 0.15s;
+            color: #6B7280; font-weight: 500; font-size: 14px;
+        }
+        .user-menu .menu-footer .sign-out:hover { background: #FEE2E2; color: #DC2626; }
+
+        .menu-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s;
+        }
+        .menu-overlay.active { opacity: 1; visibility: visible; }
+
+        @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 1024px) { .topbar .search-bar { width: 200px; } .voice-transcript { max-width: 200px; } }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .topbar { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+            .topbar .search-bar { width: 100%; order: 3; }
+            .main-container { padding: 12px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .voice-module { flex-direction: column; align-items: stretch; }
+            .voice-transcript { max-width: 100%; white-space: normal; border-radius: 12px; }
+        }
+        @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } .topbar .logo-text span { display: none; } }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="logo-icon"><img src="img/speedybosh_logo2.png" alt="SpeedyBosh" class="logo" /></div>
+            <div class="logo-text">SpeedyBosh <span>| Voice Email Assistant</span></div>
+        </div>
+        <div class="search-bar">
+            <span class="search-icon"><i class="fa-solid fa-search"></i></span>
+            <input type="text" id="log-search" placeholder="Search emails, tickets, contacts...">
+            <select id="log-sort" style="border:none;background:transparent;font-size:13px;outline:none;color:#6B7280;cursor:pointer;margin-left:8px;">
+                <option value="date_desc">↓ Date</option>
+                <option value="date_asc">↑ Date</option>
+                <option value="alpha_asc">A→Z</option>
+                <option value="alpha_desc">Z→A</option>
+            </select>
+        </div>
+        <div class="topbar-right">
+            <span class="status-badge"><span class="dot"></span> Online</span>
+            <button class="wake-btn" id="enable-wakeword-btn">🎙️ Hello Speedy</button>
+            <div class="avatar-wrapper">
+                <div class="avatar" id="avatarBtn">
+                    <span id="avatar-circle">MB</span>
+                    <span class="status-dot"></span>
+                </div>
+                <div class="user-menu" id="userMenu">
+                    <div class="menu-header">
+                        <div class="user-row">
+                            <div class="user-avatar" id="menuAvatar">MB</div>
+                            <div class="user-info">
+                                <div class="name" id="menuName">User</div>
+                                <div class="email" id="menuEmail">user@example.com</div>
+                                <span class="badge">● Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-footer">
+                        <div class="sign-out" id="menuLogout">
+                            <span class="sign-icon">🚪</span>
+                            Sign out
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="nav-section">
+                <div class="label">Main Menu</div>
+                <button class="nav-item" id="btn-dashboard"><span class="icon"><i class="fa-solid fa-chart-simple"></i></span> Dashboard</button>
+                <button class="nav-item" id="btn-new-mail"><span class="icon"><i class="fa-solid fa-pen"></i></span> New Email</button>
+                <button class="nav-item" id="btn-sent"><span class="icon"><i class="fa-solid fa-paper-plane"></i></span> Sent</button>
+                <button class="nav-item" id="btn-all-mail"><span class="icon"><i class="fa-solid fa-inbox"></i></span> All Mail <span class="badge" id="total-count">0</span></button>
+                <button class="nav-item" id="btn-starred"><span class="icon"><i class="fa-solid fa-star"></i></span> Starred <span class="badge" id="starred-count">0</span></button>
+                <button class="nav-item" id="btn-trash"><span class="icon"><i class="fa-solid fa-trash"></i></span> Trash</button>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="nav-section">
+                <div class="label">Tools</div>
+                <button class="nav-item" id="btn-history"><span class="icon"><i class="fa-solid fa-clock-rotate-left"></i></span> History</button>
+            </div>
+            <div class="sidebar-footer">
+                <div class="version">Version</div>
+                <div class="app-name">SpeedyBosh v2.0</div>
+                <div class="company">DRÄXLMAIER — DACT</div>
+            </div>
+        </aside>
+
+        <main class="content" id="main-content"></main>
+    </div>
+
+    <footer>
+        <span>DRÄXLMAIER Group — DACT Sousse Hub</span>
+        <span>SpeedyBosh v2.0 · 2026</span>
+    </footer>
+
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <script src="js/api.js?v=3"></script>
+    <script src="js/voice.js?v=9"></script>
+    <script>
+    (function() {
+
+    if (!Api.getToken()) { window.location.href = "index.html"; return; }
+
+    const state = {
+        etat: "attente",
+        email_data: { destinataire: "", objet: "", corps: "" },
+        messages: [],
+        searchQuery: "",
+        sort: "date_desc",
+        originalMainContent: "",
+        selectMode: true,
+        starMode: true,
+        readMode: true,
+        attachments: [],
+    };
+
+    const el = {
+        destInput: null, objInput: null, corpsInput: null,
+        guideText: null, statusLbl: null, pulseRing: null, waveBar: null,
+        console: null, logSearch: null, logSort: null,
+        avatarCircle: document.getElementById("avatar-circle"),
+        voiceTranscript: document.getElementById("voiceTranscript"),
+    };
+
+    function reinitEls() {
+        el.destInput = document.getElementById("dest-input");
+        el.objInput = document.getElementById("obj-input");
+        el.corpsInput = document.getElementById("corps-input");
+        el.guideText = document.getElementById("guide-text");
+        el.statusLbl = document.getElementById("status-lbl");
+        el.pulseRing = document.getElementById("pulse-ring");
+        el.waveBar = document.getElementById("wave-bar");
+        el.console = document.getElementById("console");
+        el.logSearch = document.getElementById("log-search");
+        el.logSort = document.getElementById("log-sort");
+        el.voiceTranscript = document.getElementById("voiceTranscript");
+    }
+
+    Api.me().then((user) => {
+        const initial = user.email[0].toUpperCase();
+        el.avatarCircle.textContent = initial;
+        document.getElementById("menuAvatar").textContent = initial;
+        document.getElementById("menuName").textContent = user.username || user.email.split("@")[0];
+        document.getElementById("menuEmail").textContent = user.email;
+    }).catch(() => { Api.clearToken(); window.location.href = "index.html"; });
+
+    const avatarBtn = document.getElementById("avatarBtn");
+    const userMenu = document.getElementById("userMenu");
+    const menuOverlay = document.getElementById("menuOverlay");
+
+    function closeMenu() {
+        userMenu.classList.remove("open");
+        menuOverlay.classList.remove("active");
+    }
+
+    avatarBtn.addEventListener("click", function(e) {
+        e.stopPropagation();
+        userMenu.classList.toggle("open");
+        menuOverlay.classList.toggle("active");
+    });
+
+    menuOverlay.addEventListener("click", closeMenu);
+
+    document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape") closeMenu();
+    });
+
+    document.getElementById("menuLogout").addEventListener("click", () => {
+        closeMenu();
+        Api.logout();
+        window.location.href = "index.html";
+    });
+
+    function log(text) { state.messages.push({ ts: new Date(), text }); refreshConsole(); }
+
+    const ROLE_ICON = { "Système": "🧠", "Utilisateur": "👤", "SpeedyBosh": "🤖" };
+    function logRole(role, text) { log((ROLE_ICON[role] || "•") + " " + role + " — " + text); }
+
+    function refreshConsole() {
+        const q = state.searchQuery.toLowerCase();
+        let items = state.messages.filter(m => !q || m.text.toLowerCase().includes(q) || m.ts.toLocaleString().toLowerCase().includes(q));
+        items = items.slice().sort((a, b) => {
+            switch (state.sort) {
+                case "date_asc": return a.ts - b.ts;
+                case "alpha_asc": return a.text.localeCompare(b.text);
+                case "alpha_desc": return b.text.localeCompare(a.text);
+                default: return b.ts - a.ts;
+            }
+        });
+        if (el.console) {
+            el.console.innerHTML = items.map(m => `<div class="line">[${m.ts.toLocaleString()}] ${escapeHtml(m.text)}</div>`).join("");
+        }
+        const header = document.querySelector(".log-header .log-count");
+        if (header) header.textContent = items.length + " entries";
+    }
+
+    function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+    function setGuide(text) { if (el.guideText) el.guideText.textContent = text; }
+    function setStatus(text) { if (el.statusLbl) el.statusLbl.textContent = text; }
+    function setTranscript(text) { if (el.voiceTranscript) el.voiceTranscript.innerHTML = '<span class="mic-icon">🎤</span> ' + text; }
+
+    let derniereParole = Promise.resolve();
+    function speak(text) { logRole("SpeedyBosh", text); derniereParole = voice.speak(text); return derniereParole; }
+
+    function updateForm() {
+        if (el.destInput) el.destInput.value = state.email_data.destinataire;
+        if (el.objInput) el.objInput.value = state.email_data.objet;
+        if (el.corpsInput) el.corpsInput.value = state.email_data.corps;
+    }
+
+    function validerEmail(email) { return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email); }
+
+    const PONCTUATION = {
+        "point":".","virgule":",","point virgule":";","deux points":":",
+        "point d'exclamation":"!","point d'interrogation":"?",
+        "nouvelle ligne":"\n","à la ligne":"\n",
+        "ouvrir parenthèse":"(","fermer parenthèse":")","tiret":"-","guillemet":'"',
+    };
+    function appliquerPonctuation(texte) {
+        let t = texte;
+        for (const [mot, signe] of Object.entries(PONCTUATION)) t = t.replace(new RegExp("\\b"+mot+"\\b","gi"), signe);
+        return t;
+    }
+
+    function attendre(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function construireEmail(texte) {
+        const ADDR_STOP = ["envoyer","envoie","envoi","envoies","envoyez","un","une","mail","e-mail","email","au","pour","le","la","les","du","de","bonjour","hello","oui","voulez","svp","merci","composer","écrire"];
+        let t = texte.toLowerCase().trim();
+        let m = t.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/);
+        if (m) return m[0];
+        const words = t.split(/\s+/).filter(Boolean)
+            .map(w => w.replace(/^[.,;:!?«»"']+|[.,;:!?«»"']+$/g, ""));
+        const tokens = [];
+        for (let i = words.length - 1; i >= 0; i--) {
+            if (ADDR_STOP.includes(words[i])) break;
+            tokens.unshift(words[i]);
+        }
+        let adr = (tokens.length ? tokens : words).join(" ")
+            .replace(/\barobase\b|\barrobase\b|\bat\b|\bate\b|\ba\s+t\b|\bà\b|\ba\b/g, "@")
+            .replace(/\bpoints?\b|\bpointe\b|\bdot\b/g, ".")
+            .replace(/[^a-z0-9@._-]/g, "")
+            .replace(/^[@.]+/, "")
+            .replace(/[@.]+$/, "");
+        return adr;
+    }
+
+    function router(texte) {
+        const c = texte.toLowerCase().trim();
+        if (state.etat === "accueil") {
+            const email = construireEmail(texte);
+            if (email && validerEmail(email)) {
+                state.email_data.destinataire = email;
+                updateForm(); log("📧 Email: " + state.email_data.destinataire);
+                setGuide("Quel est l'objet de votre message ?");
+                speak("Destinataire validé. Quel est l'objet de votre message ?");
+                state.etat = "objet"; continuerEcoute();
+            } else {
+                setGuide("Quel est le destinataire ?");
+                speak("Je n'ai pas compris l'adresse. Quel est le destinataire ?");
+                state.etat = "destinataire"; continuerEcoute();
+            }
+            return;
+        }
+        if (c.includes("annuler") || c.includes("cancel")) { speak("Brouillon annulé."); retourVeille(); return; }
+        if (state.etat === "destinataire") {
+            const email = construireEmail(texte);
+            if (validerEmail(email)) {
+                state.email_data.destinataire = email;
+                updateForm(); log("📧 Email: " + state.email_data.destinataire);
+                setGuide("Quel est l'objet de votre message ?");
+                speak("Destinataire validé. Quel est l'objet de votre message ?");
+                state.etat = "objet"; continuerEcoute();
+            } else { speak("Adresse e-mail invalide. Réessayez."); continuerEcoute(); }
+        } else if (state.etat === "objet") {
+            state.email_data.objet = texte; updateForm(); log("📌 Objet: " + texte);
+            setGuide("Je vous écoute pour le corps du message.");
+            speak("Objet enregistré. Je vous écoute pour le corps du message.");
+            state.etat = "corps"; continuerEcoute();
+        } else if (state.etat === "corps") {
+            const phrase = c.replace(/[.,!?;]$/,"").trim();
+            const sendWords = ["envoyer","envoie","envoyez","send","confirmer","oui","yes","ok","okay","c'est bon","d'accord"];
+            const nbMots = phrase.split(/\s+/).filter(Boolean).length;
+            const isSend = nbMots <= 4 && sendWords.some(w => phrase === w || phrase.startsWith(w + " "));
+            if (isSend) { envoyerEmail(); return; }
+            if (c.includes("effacer") || c.includes("clear")) { state.email_data.corps = ""; updateForm(); speak("Corps du message effacé."); continuerEcoute(); return; }
+            const corps = appliquerPonctuation(texte);
+            state.email_data.corps += (state.email_data.corps ? " " : "") + corps;
+            updateForm(); log("📝 Corps mis à jour: " + corps);
+            setGuide('Dites "Envoyer" quand vous avez terminé.');
+            continuerEcoute();
+        }
+    }
+
+    const DELAI_REPONSE = 10000;
+
+    async function continuerEcoute() {
+        setStatus("...");
+        const debut = Date.now();
+        await derniereParole;
+        const ecoule = Date.now() - debut;
+        await attendre(Math.max(0, 1000 - ecoule));
+        const fenetreFin = Date.now() + DELAI_REPONSE;
+        let affichage = null;
+        const majCompteARebours = () => {
+            const reste = Math.max(0, Math.ceil((fenetreFin - Date.now()) / 1000));
+            if (affichage !== reste) {
+                affichage = reste;
+                setStatus("🎙️ À vous de parler… (" + reste + "s)");
+            }
+        };
+        majCompteARebours();
+        setTranscript("🎤 À vous de parler...");
+        const compte = setInterval(majCompteARebours, 250);
+        while (Date.now() < fenetreFin) {
+            setTranscript("🎤 Je vous écoute... parlez maintenant");
+            if (el.pulseRing) el.pulseRing.classList.add("active");
+            if (el.waveBar) el.waveBar.classList.add("active");
+            try {
+                const texte = await voice.listenOnce();
+                const t = (texte || "").trim();
+                if (t) {
+                    clearInterval(compte);
+                    logRole("Utilisateur", '"' + texte + '"');
+                    setTranscript('"' + texte + '"');
+                    router(texte);
+                    return;
+                }
+                await attendre(700);
+            } catch (err) {
+                clearInterval(compte);
+                log("❌ Mic error: " + err.message); retourVeille(); return;
+            } finally {
+                setStatus("Idle...");
+                if (el.pulseRing) el.pulseRing.classList.remove("active");
+                if (el.waveBar) el.waveBar.classList.remove("active");
+            }
+        }
+        clearInterval(compte);
+        state.silences = (state.silences || 0) + 1;
+        if (state.silences >= 2) {
+            state.silences = 0;
+            speak("Aucune réponse. Je retourne en veille.");
+            retourVeille();
+            return;
+        }
+        logRole("Utilisateur", "(aucune réponse dans les " + (DELAI_REPONSE / 1000) + " s)");
+        speak("Je n'ai rien entendu. Dites « Annuler » pour arrêter, ou répondez à la question.");
+        continuerEcoute();
+    }
+
+    function retourVeille() {
+        resetDraft();
+        setStatus("Veille — dites « Hello Speedy »");
+        if (typeof wakeWord !== "undefined") wakeWord.start();
+    }
+
+    function demarrerConversation() {
+        loadView("New email");
+        const btn = document.getElementById("enable-wakeword-btn");
+        if (btn) { btn.classList.remove("active"); btn.innerHTML = "🎙️ Hello Speedy"; }
+        if (typeof wakeWord !== "undefined") wakeWord.stop();
+        state.etat = "accueil";
+        setGuide("Souhaitez-vous rédiger un e-mail ?");
+        setTimeout(() => {
+            speak("Bonjour ! Je vous écoute. Souhaitez-vous rédiger un e-mail ?");
+            continuerEcoute();
+        }, 600);
+    }
+
+    function relireMail(avecConfirmation) {
+        const d = state.email_data;
+        let msg = "Recipient: "+(d.destinataire||"none")+". Subject: "+(d.objet||"none")+". Body: "+(d.corps||"empty")+".";
+        if (avecConfirmation) { msg += " Send, edit or cancel?"; setGuide("Say: Send, Edit or Cancel."); }
+        log("📖 Reading mail"); speak(msg);
+    }
+
+    function resetDraft() { state.etat = "attente"; state.silences = 0; state.email_data = { destinataire:"", objet:"", corps:"" }; state.attachments = []; updateForm(); setGuide("Dites « Hello Speedy » pour commencer.");
+        const fi = document.getElementById("attach-input"); if (fi) fi.value = "";
+        const fp = document.getElementById("filePreview"); if (fp) { fp.innerHTML = ""; fp.classList.remove("show"); }
+    }
+
+    async function envoyerEmail() {
+        const d = state.email_data;
+        if (!validerEmail(d.destinataire)) { speak("Destinataire invalide."); return; }
+        if (!d.objet) { speak("L'objet est vide."); return; }
+        log("📤 Envoi en cours...");
+        try {
+            const formData = new FormData();
+            formData.append("to", d.destinataire);
+            formData.append("subject", d.objet);
+            formData.append("body", d.corps);
+            for (const f of state.attachments) formData.append("files", f);
+            const res = await fetch(API_BASE+"/mail/send", {
+                method:"POST",
+                headers:{ Authorization:"Bearer "+Api.getToken() },
+                body: formData,
+            });
+            if (!res.ok) throw new Error((await res.json()).detail || "Erreur d'envoi");
+            const data = await res.json().catch(() => ({}));
+            if (data.warnings && data.warnings.length) {
+                log("⚠️ Mail envoyé avec avertissements: " + data.warnings.join(" | "));
+            } else {
+                logRole("SpeedyBosh", "Le message a été envoyé avec succès.");
+            }
+            speak("Le message a été envoyé avec succès."); retourVeille();
+        } catch (err) { log("❌ Erreur d'envoi: "+err.message); speak("Erreur lors de l'envoi du message."); }
+    }
+
+    function polishText(text) {
+        if (!text) return text;
+        let s = text.trim().replace(/\s+/g," ");
+        s = s.replace(/\s+([,;:.!?])/g,"$1").replace(/([,;:.!?])(\w)/g,"$1 $2");
+        s = s.charAt(0).toUpperCase()+s.slice(1);
+        if (!/[.!?]$/.test(s)) s += ".";
+        return s;
+    }
+
+    function renderMails(mails) {
+        const mc = document.getElementById("main-content");
+        mc.querySelectorAll(".mail-item").forEach(i => i.remove());
+        const noMsg = mc.querySelector("p[style*='padding: 0 14px']");
+        if (noMsg) noMsg.remove();
+        if (!mails.length) { mc.innerHTML += "<p style='padding:0 22px;color:#6B7280;'>No emails found.</p>"; return; }
+        const isTrash = window._currentView === "/mail/trash";
+        mails.forEach(mail => {
+            const item = document.createElement("div"); item.className = "mail-item"; item.dataset.id = mail.id;
+            const starClass = mail.starred ? "fa-solid text-warning" : "fa-regular";
+            if (mail.read) item.style.opacity = "0.7";
+            const restore = isTrash ? '<i class="fa-solid fa-arrow-rotate-left mail-restore" title="Restore"></i>' : "";
+            item.innerHTML = `
+                <div class="mail-actions">
+                    <input type="checkbox" class="mail-select">
+                    <i class="${starClass} fa-star mail-star"></i>${restore}
+                    <i class="fa-solid fa-trash mail-trash"></i>
+                </div>
+                <div class="mail-info">
+                    <p><strong>From:</strong> ${escapeHtml(mail.sender)}</p>
+                    <p><strong>To:</strong> ${escapeHtml(mail.recipient)}</p>
+                    <p><strong>Subject:</strong> ${escapeHtml(mail.subject)}</p>
+                    <p>${escapeHtml(mail.body)}</p>
+                    <p><em>${new Date(mail.sent_at).toLocaleString()}</em></p>
+                </div>`;
+            mc.appendChild(item);
+        });
+    }
+
+    function loadDashboard() {
+        const mc = document.getElementById("main-content");
+        mc.innerHTML = state.originalMainContent;
+        reinitEls(); refreshConsole(); updateForm();
+        setGuide('Dites « Hello Speedy » pour commencer.'); setStatus("SpeedyBosh"); setTranscript('Say "Hello speedy" to start');
+        attachComposeListeners(); initLogListeners(); loadStats();
+        for (let i = 0; i < 20; i++) { if (el.waveBar) { const b = document.createElement("span"); el.waveBar.appendChild(b); } }
+    }
+
+    async function loadStats() {
+        try {
+            const res = await fetch(API_BASE+"/mail/all");
+            const all = await res.json();
+            const total = all.length;
+            const starred = all.filter(m => m.starred).length;
+            document.getElementById("total-count").textContent = total;
+            document.getElementById("starred-count").textContent = starred;
+            const nums = document.querySelectorAll(".stat-number");
+            if (nums.length >= 4) {
+                nums[0].textContent = total;
+                nums[1].textContent = all.filter(m => m.read).length;
+                nums[2].textContent = all.filter(m => !m.read).length;
+                nums[3].textContent = starred;
+            }
+        } catch(e) {}
+    }
+
+    function loadView(view) {
+        const mc = document.getElementById("main-content");
+        if (view === "New email") {
+            mc.innerHTML = state.originalMainContent;
+            reinitEls(); attachComposeListeners(); initLogListeners();
+            state.email_data = { destinataire:"", objet:"", corps:"" };
+            updateForm(); log("✳️ Nouveau mail démarré"); setGuide("Quel est le destinataire ?"); setTranscript('Say "Hello speedy" to start');
+            state.etat = "destinataire"; refreshConsole();
+            for (let i = 0; i < 20; i++) { if (el.waveBar) { const b = document.createElement("span"); el.waveBar.appendChild(b); } }
+            return;
+        }
+        if (view === "Dashboard") { loadDashboard(); return; }
+        let title = "", endpoint = "";
+        if (view === "All Mail") { title = "All Mail"; endpoint = "/mail/all"; }
+        else if (view === "Sent") { title = "Sent"; endpoint = "/mail/all"; }
+        else if (view === "Trash") { title = "Trash"; endpoint = "/mail/trash"; }
+        else if (view === "Starred") { title = "Starred"; endpoint = "/mail/starred"; }
+        else if (view === "History") { title = "History"; endpoint = "/mail/all"; }
+        else if (view === "Inbox") { title = "Inbox"; endpoint = "/mail/all"; }
+        else if (view === "Settings") { mc.innerHTML = "<h2 style='padding:20px;font-size:18px;font-weight:700;'>Settings</h2><p style='padding:0 20px;color:#6B7280;'>Coming soon...</p>"; return; }
+        window._currentView = endpoint;
+        mc.innerHTML = `
+            <div class="email-list">
+                <h2><i class="fa-solid ${view==='Trash'?'fa-trash':view==='Starred'?'fa-star':'fa-envelope'}"></i> ${title}</h2>
+                <div class="mail-toolbar">
+                    <button id="btn-toggle-read"><i class="fa-solid fa-envelope-open"></i> Mark read</button>
+                    <button id="btn-toggle-star"><i class="fa-solid fa-star"></i> Star</button>
+                    <button id="btn-toggle-select"><i class="fa-solid fa-square-check"></i> Select all</button>
+                    <button id="btn-delete-selected"><i class="fa-solid fa-trash"></i> Delete</button>
+                    <button id="btn-filter-trash"><i class="fa-solid fa-trash"></i> Trash</button>
+                    <span id="selected-count">0 selected</span>
+                </div>
+            </div>`;
+        async function showStarred() { const r = await fetch(API_BASE+"/mail/starred"); renderMails(await r.json()); }
+        async function showTrash() { const r = await fetch(API_BASE+"/mail/trash"); renderMails(await r.json()); }
+        document.getElementById("btn-toggle-read").addEventListener("click", async () => {
+            for (const cb of [...document.querySelectorAll(".mail-select:checked")]) {
+                const id = cb.closest(".mail-item").dataset.id;
+                try { await fetch(API_BASE+"/mail/"+id+(state.readMode?"/read":"/unread"),{method:"POST"}); cb.closest(".mail-item").style.opacity = state.readMode?"0.7":"1"; } catch(e) {}
+            }
+            document.getElementById("btn-toggle-read").innerHTML = state.readMode ? '<i class="fa-solid fa-envelope"></i> Mark unread' : '<i class="fa-solid fa-envelope-open"></i> Mark read';
+            state.readMode = !state.readMode;
+        });
+        document.getElementById("btn-toggle-star").addEventListener("click", async () => {
+            if (state.starMode) {
+                for (const cb of [...document.querySelectorAll(".mail-select:checked")]) {
+                    const id = cb.closest(".mail-item").dataset.id;
+                    try { await fetch(API_BASE+"/mail/"+id+"/star",{method:"POST"}); cb.closest(".mail-item").querySelector(".mail-star").className = "fa-solid fa-star mail-star text-warning"; } catch(e) {}
+                }
+            } else { await showStarred(); }
+            document.getElementById("btn-toggle-star").innerHTML = state.starMode ? '<i class="fa-solid fa-filter"></i> Filter starred' : '<i class="fa-solid fa-star"></i> Star';
+            state.starMode = !state.starMode;
+        });
+        document.getElementById("btn-toggle-select").addEventListener("click", () => {
+            if (state.selectMode) {
+                document.querySelectorAll(".mail-select").forEach(cb => cb.checked = true);
+                const c = document.getElementById("selected-count");
+                if (c) c.textContent = document.querySelectorAll(".mail-select:checked").length + " selected";
+            } else {
+                fetch(API_BASE+endpoint).then(r=>r.json()).then(mails=>renderMails(mails)).catch(e=>console.error(e));
+            }
+            document.getElementById("btn-toggle-select").innerHTML = state.selectMode ? '<i class="fa-solid fa-inbox"></i> Show all' : '<i class="fa-solid fa-square-check"></i> Select all';
+            state.selectMode = !state.selectMode;
+        });
+        const ftb = document.getElementById("btn-filter-trash");
+        if (ftb) ftb.addEventListener("click", async () => { await showTrash(); });
+        fetch(API_BASE+endpoint).then(r=>r.json()).then(mails=>renderMails(mails)).catch(err => mc.innerHTML += "<p style='padding:0 22px;color:red;'>Error: "+err.message+"</p>");
+    }
+
+    function attachComposeListeners() {
+        if (el.destInput) el.destInput.addEventListener("input",()=>state.email_data.destinataire=el.destInput.value);
+        if (el.objInput) el.objInput.addEventListener("input",()=>state.email_data.objet=el.objInput.value);
+        if (el.corpsInput) el.corpsInput.addEventListener("input",()=>state.email_data.corps=el.corpsInput.value);
+
+        document.querySelectorAll(".mic-btn, .icon-btn[data-field]").forEach(btn => {
+            if (btn.__micListenerAttached) return;
+            btn.__micListenerAttached = true;
+            let origHTML = btn.innerHTML;
+            let isRunning = false;
+
+            btn.addEventListener("click", async () => {
+                if (isRunning) return;
+                isRunning = true;
+                const field = btn.dataset.field;
+                origHTML = btn.innerHTML;
+                log("🔘 Bouton micro cliqué → champ: " + field + " | state.etat=" + state.etat);
+
+                if (typeof wakeWord !== "undefined" && wakeWord.isListening) {
+                    wakeWord.stop();
+                    const wwb = document.getElementById("enable-wakeword-btn");
+                    if (wwb) { wwb.classList.remove("active"); wwb.innerHTML = "🎙️ Hello Speedy"; }
+                }
+
+                btn.classList.add("recording");
+                if (btn.querySelector("i")) { btn.innerHTML = '<i class="fa-solid fa-stop"></i>'; }
+                else { btn.innerHTML = "⏹"; }
+                setStatus("🎤 Recording: "+field+"...");
+                setTranscript("🎤 Listening... (parlez maintenant)");
+                if (el.pulseRing) el.pulseRing.classList.add("active");
+                if (el.waveBar) el.waveBar.classList.add("active");
+
+                try {
+                    log("⏳ Appel de voice.listenOnce()...");
+                    const texte = await voice.listenOnce(20000);
+                    log("✅ listenOnce résolu avec texte = \"" + texte + "\" (" + texte.length + " caractères)");
+                    if (!texte || !texte.trim()) {
+                        logRole("Utilisateur", '"(aucun texte reconnu)"');
+                        setTranscript("⚠️ Aucun texte reconnu. Réessayez.");
+                        setTimeout(()=>{ isRunning = false; }, 400);
+                        return;
+                    }
+                    logRole("Utilisateur", '"'+texte+'"');
+                    setTranscript('"'+texte+'"');
+
+                    if (field === "destinataire") {
+                        const email = construireEmail(texte);
+                        log("📧 Email construit: \"" + email + "\" à partir de \"" + texte + "\"");
+                        if (email && validerEmail(email)) {
+                            state.email_data.destinataire = email;
+                            log("✅ Destinataire mis à jour: " + state.email_data.destinataire);
+                        } else {
+                            state.email_data.destinataire = texte.replace(/\s/g, "").toLowerCase();
+                            log("⚠️ Email invalide, on utilise brut: " + state.email_data.destinataire);
+                        }
+                        if (state.etat === "attente" || state.etat === "accueil") { state.etat = "objet"; }
+                    }
+                    else if (field === "objet") {
+                        state.email_data.objet = texte;
+                        log("📌 Objet mis à jour: " + state.email_data.objet);
+                        if (state.etat === "attente" || state.etat === "destinataire") { state.etat = "corps"; }
+                    }
+                    else if (field === "corps") {
+                        const corps = appliquerPonctuation(texte);
+                        state.email_data.corps += (state.email_data.corps ? " " : "") + corps;
+                        log("📝 Corps mis à jour, ajouté: \"" + corps + "\"");
+                    }
+                    updateForm();
+                    log("💾 updateForm() exécuté. Etat actuel: dest="+state.email_data.destinataire+" | obj="+state.email_data.objet+" | corps.length="+state.email_data.corps.length);
+                } catch(err) {
+                    log("❌ Mic error: "+err.message);
+                    setTranscript("❌ Erreur micro: " + err.message);
+                } finally {
+                    btn.classList.remove("recording");
+                    btn.innerHTML = origHTML;
+                    setStatus("Idle...");
+                    if (el.pulseRing) el.pulseRing.classList.remove("active");
+                    if (el.waveBar) el.waveBar.classList.remove("active");
+                    setTimeout(()=>{ isRunning = false; }, 300);
+                }
+            });
+        });
+        const sb = document.getElementById("send-btn");
+        if (sb) sb.addEventListener("click", () => {
+            if (el.destInput) state.email_data.destinataire = el.destInput.value.trim();
+            if (el.objInput) state.email_data.objet = el.objInput.value.trim();
+            if (el.corpsInput) state.email_data.corps = el.corpsInput.value.trim();
+            envoyerEmail();
+        });
+    }
+
+    function initLogListeners() {
+        if (el.logSearch) el.logSearch.addEventListener("keyup", () => { state.searchQuery = el.logSearch.value.trim(); refreshConsole(); });
+        if (el.logSort) el.logSort.addEventListener("change", () => { state.sort = el.logSort.value; refreshConsole(); });
+    }
+
+    const mainContent = document.getElementById("main-content");
+    mainContent.innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card turquoise">
+                <div class="stat-icon"><i class="fa-solid fa-envelope"></i></div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">Total Emails</div>
+                <span class="stat-change up">↑ synced</span>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-icon"><i class="fa-solid fa-check-circle"></i></div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">Resolved</div>
+                <span class="stat-change up">↑ synced</span>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">Pending</div>
+                <span class="stat-change down">↓ synced</span>
+            </div>
+            <div class="stat-card pink">
+                <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">Starred</div>
+                <span class="stat-change up">↑ synced</span>
+            </div>
+        </div>
+
+        <div class="compose-card">
+            <h3><i class="fa-solid fa-pen"></i> New Message</h3>
+            <div class="guide-text" id="guide-text">Say "Hello speedy" to start</div>
+            <div class="form-row">
+                <label>To:</label>
+                <div class="input-group">
+                    <input type="text" id="dest-input" placeholder="recipient@example.com">
+                    <button class="mic-btn" data-field="destinataire" title="Dictate"><i class="fa-solid fa-microphone"></i></button>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Subject:</label>
+                <div class="input-group">
+                    <input type="text" id="obj-input" placeholder="Subject">
+                    <button class="mic-btn" data-field="objet" title="Dictate"><i class="fa-solid fa-microphone"></i></button>
+                </div>
+            </div>
+            <div class="form-row body-row">
+                <label>Body:</label>
+                <div class="body-input-wrapper">
+                    <textarea id="corps-input" placeholder="Your message..."></textarea>
+                    <div class="body-actions">
+                        <button id="mic-body-btn" class="icon-btn mic-btn" data-field="corps" title="Dictate">🎤</button>
+                        <button id="ai-redaction-btn" class="icon-btn" title="Rédiger / Corriger avec l'IA">✨</button>
+                        <label for="attach-input" class="icon-btn" id="attach-btn" title="Joindre des fichiers" style="cursor:pointer;">📄</label>
+                        <input type="file" id="attach-input" accept=".pdf,.docx,.jpg,.png,.txt" multiple style="display:none;">
+                    </div>
+                </div>
+                <div id="filePreview" class="file-preview"></div>
+            </div>
+            <div class="form-actions">
+                <button class="send-btn" id="send-btn"><i class="fa-solid fa-paper-plane"></i> Send</button>
+            </div>
+        </div>
+
+        <div class="log-module" id="console-wrapper">
+            <div class="log-header">
+                <h4><i class="fa-solid fa-list"></i> Activity Log</h4>
+                <span class="log-count">0 entries</span>
+            </div>
+            <div class="console" id="console"></div>
+        </div>
+
+        <div class="voice-module">
+            <div class="voice-left">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div class="pulse-ring" id="pulse-ring">
+                        <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+                    </div>
+                    <div class="status-lbl" id="status-lbl">SpeedyBosh</div>
+                    <div class="wave-bar" id="wave-bar"></div>
+                </div>
+            </div>
+            <div class="voice-transcript" id="voiceTranscript">
+                <span class="mic-icon">🎤</span> Say "Hello speedy" to start
+            </div>
+        </div>
+    `;
+
+    state.originalMainContent = mainContent.innerHTML;
+    reinitEls(); attachComposeListeners(); initLogListeners(); refreshConsole();
+    for (let i = 0; i < 20; i++) { if (el.waveBar) { const b = document.createElement("span"); el.waveBar.appendChild(b); } }
+    loadStats();
+
+    document.getElementById("btn-new-mail").onclick = () => loadView("New email");
+    document.getElementById("btn-sent").onclick = () => loadView("Sent");
+    document.getElementById("btn-all-mail").onclick = () => loadView("All Mail");
+    document.getElementById("btn-trash").onclick = () => loadView("Trash");
+    document.getElementById("btn-starred").onclick = () => loadView("Starred");
+    document.getElementById("btn-history").onclick = () => loadView("History");
+    document.getElementById("btn-dashboard").onclick = () => loadDashboard();
+
+    log("🔧 Calibration du microphone...");
+    log("✅ Microphone calibré!");
+
+    document.addEventListener("change", e => {
+        if (e.target.classList.contains("mail-select")) {
+            const c = document.getElementById("selected-count");
+            if (c) c.textContent = document.querySelectorAll(".mail-select:checked").length + " selected";
+        }
+    });
+
+    document.addEventListener("click", async e => {
+        if (e.target.classList.contains("mail-star")) {
+            const id = e.target.closest(".mail-item").dataset.id;
+            try {
+                const r = await fetch(API_BASE+"/mail/"+id+"/star",{method:"POST"});
+                if (!r.ok) throw Error();
+                e.target.classList.toggle("fa-regular"); e.target.classList.toggle("fa-solid"); e.target.classList.toggle("text-warning");
+            } catch(e) { console.error("Star error:", e); }
+        }
+        if (e.target.classList.contains("mail-trash")) {
+            const id = e.target.closest(".mail-item").dataset.id;
+            try {
+                const r = await fetch(API_BASE+"/mail/"+id,{method:"DELETE"});
+                if (!r.ok) throw Error();
+                e.target.closest(".mail-item").classList.add("fade-out");
+                setTimeout(() => e.target.closest(".mail-item").remove(), 400);
+            } catch(e) { console.error("Delete error:", e); }
+        }
+        if (e.target.classList.contains("mail-restore")) {
+            const id = e.target.closest(".mail-item").dataset.id;
+            try {
+                const r = await fetch(API_BASE+"/mail/"+id+"/restore",{method:"POST"});
+                if (!r.ok) throw Error();
+                e.target.closest(".mail-item").classList.add("fade-out");
+                setTimeout(() => e.target.closest(".mail-item").remove(), 400);
+            } catch(e) { console.error("Restore error:", e); }
+        }
+        if (e.target.id === "btn-delete-selected" || e.target.closest("#btn-delete-selected")) {
+            for (const cb of [...document.querySelectorAll(".mail-select:checked")]) {
+                const id = cb.closest(".mail-item").dataset.id;
+                try {
+                    await fetch(API_BASE+"/mail/"+id,{method:"DELETE"});
+                    cb.closest(".mail-item").classList.add("fade-out");
+                    setTimeout(() => cb.closest(".mail-item").remove(), 400);
+                } catch(e) { console.error("Delete error:", e); }
+            }
+        }
+    });
+
+    class WakeWordListener {
+      constructor({ wakePhrase = "hello speedy", onWakeWordDetected, onLog }) {
+        this.wakePhrase = wakePhrase.toLowerCase();
+        this.onWakeWordDetected = onWakeWordDetected || (() => {});
+        this.onLog = onLog || (() => {});
+        this.recognition = null;
+        this.isListening = false;
+        this.restartTimeout = null;
+        this._initRecognition();
+      }
+      _initRecognition() {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { this.onLog("Web Speech API not supported.", "error"); return; }
+        this.recognition = new SR();
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+        this.recognition.lang = "fr-FR";
+        this.recognition.onresult = (event) => {
+          const last = event.results[event.results.length - 1];
+          const t = last[0].transcript.toLowerCase().trim();
+          if (t.includes(this.wakePhrase)) {
+            this.onLog(`Wake-word détecté: "${t}"`, "success");
+            this.onWakeWordDetected(t);
+          }
+        };
+        this.recognition.onerror = (event) => {
+          if (event.error !== "no-speech" && event.error !== "aborted")
+            this.onLog(`Wake-word error: ${event.error}`, "error");
+        };
+        this.recognition.onend = () => {
+          if (this.isListening) {
+            this.restartTimeout = setTimeout(() => { try { this.recognition.start(); } catch(e) {} }, 300);
+          }
+        };
+      }
+      start() {
+        if (!this.recognition || this.isListening) return;
+        window.__speechController.request(this);
+        this.isListening = true;
+        try { this.recognition.start(); this.onLog('Passive listening — say "Hello Speedy"', "info"); }
+        catch(e) { this.onLog(`Failed to start: ${e.message}`, "error"); }
+      }
+      stop() {
+        this.isListening = false;
+        clearTimeout(this.restartTimeout);
+        if (this.recognition) this.recognition.stop();
+        window.__speechController.release(this);
+        this.onLog("Passive listening stopped.", "info");
+      }
+    }
+
+    const wakeWord = new WakeWordListener({
+      wakePhrase: "hello speedy",
+      onWakeWordDetected: (texte) => {
+        logRole("Utilisateur", '"' + texte + '"');
+        demarrerConversation();
+      },
+      onLog: (msg, type) => {
+        const icon = { success:"✅", error:"❌", info:"🎙️" }[type] || "•";
+        log(icon + " " + msg);
+      },
+    });
+
+    const wwBtn = document.getElementById("enable-wakeword-btn");
+    if (wwBtn) {
+      wwBtn.addEventListener("click", () => {
+        if (wakeWord.isListening) {
+          wakeWord.stop();
+          wwBtn.classList.remove("active");
+          wwBtn.innerHTML = "🎙️ Hello Speedy";
+        } else {
+          wakeWord.start();
+          wwBtn.classList.add("active");
+          wwBtn.innerHTML = "🔴 Listening...";
+        }
+      });
+    }
+
+    setTimeout(() => {
+      logRole("Système", "État de veille — l'application est ouverte en arrière-plan.");
+      wakeWord.start();
+    }, 1200);
+
+    document.querySelector("#ai-redaction-btn")?.addEventListener("click", async () => {
+      const btn = document.querySelector("#ai-redaction-btn");
+      const textarea = document.querySelector("#corps-input");
+      const currentText = textarea.value.trim();
+
+      if (!currentText) {
+        log("⚠️ Le champ Body est vide, rien à corriger/rédiger.");
+        return;
+      }
+
+      if (btn.classList.contains("loading")) return;
+
+      btn.classList.add("loading");
+      log("✨ Rédaction/correction IA en cours...");
+      console.log("[AI Redaction] Envoi du texte:", currentText);
+
+      try {
+        const correctedText = await callAiRedactionWithTimeout(currentText, 10000);
+        textarea.value = correctedText;
+        log("✅ Message corrigé et amélioré par l'IA.");
+        console.log("[AI Redaction] Réponse reçue:", correctedText);
+      } catch (err) {
+        console.error("[AI Redaction] Erreur complète:", err);
+        log("❌ Erreur IA: " + err.message);
+      } finally {
+        btn.classList.remove("loading");
+      }
+    });
+
+    document.querySelector("#attach-input")?.addEventListener("change", async (event) => {
+      const input = event.target;
+      const files = input.files;
+      if (!files.length) return;
+
+      const preview = document.getElementById("filePreview");
+      const corpsTa = document.getElementById("corps-input");
+
+      for (const file of files) {
+        state.attachments.push(file);
+        const nameEl = document.createElement("div");
+        nameEl.innerHTML = "📄 " + file.name;
+        preview.appendChild(nameEl);
+        if (file.type === "application/pdf") {
+          const embed = document.createElement("embed");
+          embed.src = URL.createObjectURL(file);
+          embed.type = "application/pdf";
+          embed.style.width = "100%";
+          embed.style.height = "400px";
+          embed.style.marginBottom = "8px";
+          preview.appendChild(embed);
+        }
+        if (corpsTa) {
+          const marker = "\n[PDF intégré: " + file.name + "]\n";
+          const start = corpsTa.selectionStart ?? corpsTa.value.length;
+          const end = corpsTa.selectionEnd ?? corpsTa.value.length;
+          corpsTa.value = corpsTa.value.slice(0, start) + marker + corpsTa.value.slice(end);
+          corpsTa.selectionStart = corpsTa.selectionEnd = start + marker.length;
+          state.email_data.corps = corpsTa.value;
+        }
+      }
+      preview.classList.add("show");
+      input.value = "";
+    });
+
+    async function callAiRedactionWithTimeout(text, timeoutMs = 10000) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(API_BASE + "/api/ai-redaction", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          let errorDetail = "HTTP " + response.status;
+          try {
+            const errorBody = await response.json();
+            errorDetail += " - " + (errorBody.error || JSON.stringify(errorBody));
+          } catch (_) {}
+          throw new Error(errorDetail);
+        }
+
+        const data = await response.json();
+
+        if (!data.correctedText) {
+          throw new Error("Réponse du serveur invalide (pas de correctedText)");
+        }
+
+        return data.correctedText;
+
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === "AbortError") {
+          throw new Error("Le serveur n'a pas répondu à temps (timeout 10s). Vérifie que le backend tourne.");
+        }
+        if (err.message === "Failed to fetch") {
+          throw new Error("Impossible de contacter le serveur. Vérifie que /api/ai-redaction existe et que le backend est démarré.");
+        }
+        throw err;
+      }
+    }
+
+    })();
+    </script>
+</body>
+</html>

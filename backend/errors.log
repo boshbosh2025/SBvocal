@@ -1,0 +1,9 @@
+2026-08-03 23:25:52,215 INFO HTTP Request: POST http://testserver/auth/login "HTTP/1.1 200 OK"
+2026-08-03 23:25:54,249 INFO HTTP Request: POST http://testserver/mail/send "HTTP/1.1 200 OK"
+2026-08-03 23:34:56,143 INFO HTTP Request: POST http://testserver/auth/login "HTTP/1.1 200 OK"
+2026-08-03 23:35:00,449 INFO HTTP Request: POST http://testserver/mail/send "HTTP/1.1 200 OK"
+2026-08-03 23:36:07,304 INFO HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-08-03 23:36:07,304 INFO Retrying request to /chat/completions in 0.392655 seconds
+2026-08-03 23:36:08,071 INFO HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-08-03 23:36:08,071 INFO Retrying request to /chat/completions in 0.921407 seconds
+2026-08-03 23:36:09,389 INFO HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"

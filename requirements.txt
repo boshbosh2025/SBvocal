@@ -1,0 +1,11 @@
+PyMySQL
+SQLAlchemy
+alembic
+bcrypt
+python-jose
+fastapi
+uvicorn
+pydantic[email]
+openai
+pyspellchecker
+python-dotenv

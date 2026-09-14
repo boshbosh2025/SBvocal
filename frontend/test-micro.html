@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Test Micro - Speech Recognition</title>
+<style>
+  body { font-family: sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; background: #f7fafc; color: #1a1a2e; }
+  h1 { color: #0077B6; }
+  #btn { font-size: 22px; padding: 16px 32px; border: none; border-radius: 50px; cursor: pointer;
+         background: linear-gradient(135deg, #0077B6, #00D4FF); color: white; box-shadow: 0 4px 16px rgba(0,180,216,0.4);
+         transition: transform 0.2s; }
+  #btn:active { transform: scale(0.96); }
+  #btn.listening { background: linear-gradient(135deg, #DC2626, #EF4444); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.4)} 50%{box-shadow:0 0 0 20px rgba(220,38,38,0)} }
+  #status { margin: 20px 0; padding: 12px; border-radius: 8px; font-size: 16px; min-height: 24px; }
+  .ok { background: #dcfce7; color: #166534; }
+  .err { background: #fee2e2; color: #991b1b; }
+  .info { background: #dbeafe; color: #1e40af; }
+  #transcript { margin-top: 16px; padding: 20px; background: white; border-radius: 12px;
+                border: 2px solid #90E0EF; font-size: 20px; min-height: 60px; }
+  #logs { margin-top: 24px; background: #1a1a2e; color: #93c5fd; padding: 16px; border-radius: 8px;
+          font-family: monospace; font-size: 13px; max-height: 300px; overflow-y: auto; }
+  #logs p { margin: 4px 0; }
+  code { background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  .help { margin-top: 20px; padding: 14px; background: #fffbeb; border-radius: 8px; color: #92400e; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<h1>🎤 Test Reconnaissance Vocale</h1>
+<p>Ce test est <strong>indépendant</strong> de SpeedyBosh. Si ça ne marche pas ici, le problème vient du navigateur / permissions.</p>
+
+<button id="btn">▶️ Démarrer l'écoute (10s)</button>
+<div id="status" class="info">Prêt. Clique sur le bouton, puis autorise le micro et parle en français.</div>
+
+<div id="transcript">Le texte reconnu apparaîtra ici...</div>
+
+<div id="logs"></div>
+
+<div class="help">
+  <strong>Dépannage :</strong>
+  <ul>
+    <li>Vérifie l'icône 🎙️ dans la barre d'adresse → clic → "Toujours autoriser"</li>
+    <li>Testé uniquement sur <strong>Chrome</strong> / <strong>Edge</strong> (SpeechRecognition API)</li>
+    <li>Ouvre la console (F12) pour plus de détails</li>
+    <li>Si HTTPS est requis, ouvre via : <code>file://</code> fonctionne en localhost</li>
+  </ul>
+</div>
+
+<script>
+(function() {
+  const btn = document.getElementById('btn');
+  const statusEl = document.getElementById('status');
+  const transcriptEl = document.getElementById('transcript');
+  const logsEl = document.getElementById('logs');
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  function log(msg, cls) {
+    const p = document.createElement('p');
+    if (cls) p.style.color = cls === 'ok' ? '#4ade80' : cls === 'err' ? '#f87171' : '#fbbf24';
+    p.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+    logsEl.appendChild(p);
+    logsEl.scrollTop = logsEl.scrollHeight;
+    console.log('[test-micro]', msg);
+  }
+
+  if (!SR) {
+    statusEl.textContent = '❌ SpeechRecognition non supporté. Utilise Chrome ou Edge.';
+    statusEl.className = 'err';
+    btn.disabled = true;
+    return;
+  }
+
+  let recognition = null;
+  let listening = false;
+
+  async function checkPermission() {
+    try {
+      if (!navigator.mediaDevices) { log('mediaDevices indisponible', 'warn'); return true; }
+      const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+      s.getTracks().forEach(t => t.stop());
+      log('✅ Permission micro OK', 'ok');
+      return true;
+    } catch(e) {
+      log('❌ Permission refusée: ' + e.name + ' ' + e.message, 'err');
+      statusEl.textContent = '❌ Micro bloqué: ' + e.name + '. Voir icône micro dans la barre d\'adresse.';
+      statusEl.className = 'err';
+      return false;
+    }
+  }
+
+  function createRecognition() {
+    const r = new SR();
+    r.lang = 'fr-FR';
+    r.continuous = true;
+    r.interimResults = false;
+    r.maxAlternatives = 1;
+
+    r.onaudiostart = () => log('🔊 onaudiostart - micro actif');
+    r.onsoundstart = () => log('👂 onsoundstart - son détecté');
+    r.onspeechstart = () => log('🗣️ onspeechstart - parole détectée');
+    r.onspeechend = () => log('🤫 onspeechend - parole finie');
+    r.onsoundend = () => log('🔈 onsoundend - son fini');
+    r.onaudioend = () => log('🔇 onaudioend - micro fermé');
+
+    r.onstart = () => {
+      log('🎙️ onstart - reconnaissance DÉMARRÉE');
+      listening = true;
+      btn.textContent = '⏹️ En écoute... (cliquer pour arrêter)';
+      btn.classList.add('listening');
+      statusEl.textContent = '🎤 Écoute en cours... Parlez en français.';
+      statusEl.className = 'ok';
+    };
+
+    r.onend = () => {
+      log('🏁 onend - reconnaissance TERMINÉE');
+      listening = false;
+      btn.classList.remove('listening');
+      btn.textContent = '▶️ Démarrer l\'écoute (10s)';
+      if (statusEl.className === 'ok') {
+        statusEl.textContent = '⏹️ Arrêté. Résultat ci-dessus.';
+        statusEl.className = 'info';
+      }
+    };
+
+    r.onerror = (e) => {
+      log('❌ onerror: ' + e.error, 'err');
+      if (e.error === 'no-speech') {
+        statusEl.textContent = '⚠️ Aucune parole détectée. Parlez plus fort / plus proche.';
+        statusEl.className = 'err';
+      } else if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        statusEl.textContent = '❌ Micro bloqué. Cliquez sur l\'icône micro 🎙️ dans la barre d\'adresse.';
+        statusEl.className = 'err';
+      } else if (e.error === 'aborted') {
+        log('ℹ️ aborted (normal si stop appelé)', 'warn');
+      } else {
+        statusEl.textContent = '❌ Erreur: ' + e.error;
+        statusEl.className = 'err';
+      }
+    };
+
+    r.onresult = (event) => {
+      const last = event.results.length - 1;
+      const t = event.results[last][0].transcript;
+      const conf = event.results[last][0].confidence;
+      log('✅ onresult n°' + event.results.length + ' → "' + t + '" (confiance: ' + (conf*100).toFixed(1) + '%)', 'ok');
+      transcriptEl.textContent = t;
+      statusEl.textContent = '✅ Reconnu: "' + t + '"';
+      statusEl.className = 'ok';
+    };
+    return r;
+  }
+
+  btn.addEventListener('click', async () => {
+    if (listening) {
+      log('⏹️ Stop demandé par clic');
+      if (recognition) try { recognition.stop(); } catch(e) {}
+      return;
+    }
+    const ok = await checkPermission();
+    if (!ok) return;
+    transcriptEl.textContent = '...';
+    recognition = createRecognition();
+
+    // Timeout de sécurité 10s
+    const t = setTimeout(() => {
+      if (listening) {
+        log('⏰ Timeout 10s atteint → stop');
+        try { recognition.stop(); } catch(e) {}
+      }
+    }, 10000);
+    const origEnd = recognition.onend;
+    recognition.onend = function() {
+      clearTimeout(t);
+      origEnd.call(this);
+    };
+
+    try {
+      recognition.start();
+      log('▶️ recognition.start() appelé');
+    } catch(e) {
+      log('❌ start() échoué: ' + e.message, 'err');
+    }
+  });
+
+  log('Page chargée - SpeechRecognition disponible');
+})();
+</script>
+</body>
+</html>

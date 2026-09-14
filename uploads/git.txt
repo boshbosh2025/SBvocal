@@ -1,0 +1,55 @@
+cd "C:\Users\ASUS\Downloads\flahasmart (2)"
+git init
+git remote add origin https://github.com/Noureslem/FlahaSmart.git
+git checkout -b bachar
+git add .
+git commit -m "Premier commit sur la branche bachar"
+git push -u origin bachar
+-------------------------------
+---------------------------
+ls
+cd flahasmart
+pwd
+git checkout -b medbachar
+git add .
+git commit -m "Premier commit sur medbachar"
+git push -u origin medbachar
+---------------------------
+-------------------------------
+git branch
+-----------------
+# 1. Après avoir modifié vos fichiers
+git status                 # voir les fichiers modifiés (en rouge)
+git add .                  # ajouter les modifications
+git commit -m "Description" # créer le commit
+git push nouveau-depot bachar # pousser
+--------------------------------------------------
+
+# 1. Voir ce qui a changé
+git status
+
+# 2. Ajouter les nouveaux fichiers
+git add .
+
+# 3. Commiter avec un message
+git commit -m "Description des changements"
+
+# 4. Pousser vers GitHub
+git push
+----------------------------------------------------------------------------------------
+git init
+git add .
+git commit -m "Premier commit"
+git branch -M (ism branches mteaik )
+git remote add origin (https://github.com/USERNAME/NOM_DU_REPO.git) ism l répertoire mtek
+git push -u origin ism branche mteik
+-----------------------------------------------------------------------------------------
+# Les commandes :
+git init
+git add .
+git commit -m "Premier commit"
+git branch -M main
+git remote add origin https://github.com/ASUS/flahasmart.git
+git push -u origin main
+-----------------------------------------------------------------------------------------
+git remote -v
